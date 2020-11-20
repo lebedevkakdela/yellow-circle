@@ -1,57 +1,34 @@
 import sys
 from random import randrange
-from PyQt5.QtCore import Qt, QPoint
-from PyQt5.QtGui import QPainter, QColor, QPolygon
-from PyQt5.QtWidgets import QWidget, QApplication
+from PyQt5 import uic
+from PyQt5.QtGui import QPainter, QColor
+from PyQt5.QtWidgets import QApplication, QMainWindow
 
 
-class Example(QWidget):
+class Example(QMainWindow):
     def __init__(self):
         super().__init__()
-        self.initUI()
-        self.indicator = None
-        self.setMouseTracking(True)
-        self.coord = []
+        uic.loadUi('UI.ui', self)
+        self.indicator = 0
+        self.coord = [380, 230]
+        self.pushButton.clicked.connect(self.pluser)
 
-    def initUI(self):
-        self.setGeometry(300, 300, randrange(100, 300), randrange(100, 300))
-        self.setWindowTitle('Супрематизм')
-
-    def mousePressEvent(self, event):
-        if (event.button() == Qt.LeftButton):
-            self.indicator = 1
-        elif (event.button() == Qt.RightButton):
-            self.indicator = 2
+    def pluser(self):
+        self.indicator = 1
         self.update()
-
-    def keyPressEvent(self, event):
-        if event.key() == Qt.Key_Space:
-            self.indicator = 3
-        self.update()
-
-    def mouseMoveEvent(self, event):
-        self.coord = [event.x(), event.y()]
 
     def paintEvent(self, event):
         qp = QPainter()
         qp.begin(self)
-        self.draw(qp, self.indicator)
+        if self.indicator == 1:
+            self.draw(qp, 1)
         qp.end()
 
     def draw(self, qp, indicator):
         a = randrange(5, 40)
-        r, g, b = randrange(0, 255), randrange(0, 255), randrange(0, 255)
-        qp.setBrush(QColor(r, g, b))
+        qp.setBrush(QColor(255, 255, 0))
         if indicator == 1:
             qp.drawEllipse(*self.coord, a, a)
-        if indicator == 2:
-            qp.drawRect(*self.coord, a, a)
-        if indicator == 3:
-            point = QPolygon([
-                QPoint(self.coord[0], self.coord[1] - a),
-                QPoint(self.coord[0] - a, self.coord[1] + a),
-                QPoint(self.coord[0] + a, self.coord[1] + a)])
-            qp.drawPolygon(point)
 
 
 if __name__ == '__main__':
